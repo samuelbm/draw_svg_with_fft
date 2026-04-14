@@ -5,7 +5,7 @@ from matplotlib.animation import FuncAnimation
 
 class AnimationMaker:
     def __init__(self, route: np.ndarray):
-        self.route = np.concatenate([route, route[::2]])
+        self.route = route
         self.x = np.real(self.route)
         self.y = np.imag(self.route)
         self.N = len(self.route)

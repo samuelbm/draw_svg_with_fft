@@ -9,7 +9,7 @@ class SvgAnalyzer:
 
     def compute_route(self, n_samples: int) -> np.ndarray:
         paths, _ = svg2paths(self.svg_path)
-
+        print(f"there are path= {len(paths)}")
         if len(paths) == 0:
             raise ValueError("No paths found in SVG")
 
@@ -51,7 +51,7 @@ class SvgAnalyzer:
 
 if __name__ == "__main__":
     svg_path = "./files/music-note.svg"
-    n_samples = 1000
+    n_samples = 1024
 
     analyzer = SvgAnalyzer(svg_path)
     route = analyzer.compute_route(n_samples)
