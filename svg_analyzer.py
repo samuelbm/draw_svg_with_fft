@@ -2,7 +2,6 @@ import numpy as np
 from svgpathtools import svg2paths
 import matplotlib.pyplot as plt
 
-
 class SvgAnalyzer:
     def __init__(self, svg_path: str):
         self.svg_path = svg_path
