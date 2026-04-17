@@ -54,7 +54,10 @@ if __name__ == "__main__":
         if n_circle == 0:
             line = plt.Line2D([0, circle_centers[n_circle, point_index].real], [0, circle_centers[n_circle, point_index].imag])
         else:
-            line = plt.Line2D([circle_centers[n_circle-1, point_index].real, circle_centers[n_circle, point_index].real], [circle_centers[n_circle-1, point_index].imag, circle_centers[n_circle, point_index].imag])
+            line = plt.Line2D(
+                [circle_centers[n_circle-1, point_index].real, circle_centers[n_circle, point_index].real],
+                [circle_centers[n_circle-1, point_index].imag, circle_centers[n_circle, point_index].imag]
+            )
         ax.add_line(line)
 
     ax.set_aspect('equal')

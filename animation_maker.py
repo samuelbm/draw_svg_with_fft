@@ -85,8 +85,8 @@ class AnimationMaker:
             np.imag(self.circle_routes).ravel()
         ])
 
-        xmin, xmax = 2 * np.min(all_real), 2 * np.max(all_real)
-        ymin, ymax = 2 * np.min(all_imag), 2 * np.max(all_imag)
+        xmin, xmax = 1.1 * np.min(all_real), 1.1 * np.max(all_real)
+        ymin, ymax = 1.1 * np.min(all_imag), 1.1 * np.max(all_imag)
 
         self.ax.set_facecolor("black")
         self.ax.set_aspect("equal")
@@ -112,10 +112,6 @@ if __name__ == "__main__":
     t = np.linspace(0, 2, N, endpoint=True)
     k = np.linspace(0, 2, n_circles, endpoint=True)
     routes = np.cumsum(t[None, :] + 0.2 * np.exp(1j * (np.pi * t[None, :] + k[:, None])), axis=1)
-
-    # for circle_index in range(n_circles):
-    #     plt.plot(routes[circle_index, :].real, routes[circle_index, :].imag)
-    # plt.show()
 
     animation_maker = AnimationMaker(routes, radii)
     animation_maker.play(duration)
