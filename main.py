@@ -7,24 +7,21 @@ from animation_maker import AnimationMaker
 
 if __name__ == "__main__":
     svg_path = "./files/music-note.svg"
-    n_samples = 1000
+    n_samples = 4096
     duration = 3
-    n_circle = 980
+    n_circle = 4001
     svg_analyzer = SvgAnalyzer(svg_path)
     route = svg_analyzer.compute_route(n_samples)
 
     fft_plotter = FftPlotter(route, n_circle)
 
-    route_approx = fft_plotter.X_approx
+    route_approx = fft_plotter.route_approx
+    route = fft_plotter.route
 
-    N =len(fft_plotter.route)
-    t = np.linspace(0, N, N, False)
-    x = fft_plotter.route
-    y = fft_plotter.X_approx
+    animation_maker = AnimationMaker(route_approx)
+    animation_maker.play(duration)
 
-    plt.plot(t, np.abs(x))
-    plt.plot(t, np.abs(y))
-    plt.show()
+    # plt.scatter(route.real, route.imag)
+    # plt.scatter(route_approx.real, route_approx.imag)
+    # plt.show()
 
-    # animation_maker = AnimationMaker(route_approx)
-    # animation_maker.play(duration)
