@@ -8,7 +8,6 @@ from animation_maker import AnimationMaker
 if __name__ == "__main__":
     save_path = "./files/rose.mp4"
     svg_path = "./files/rose.svg"
-    save_path = None
 
     n_samples = 1024
     duration = 1
