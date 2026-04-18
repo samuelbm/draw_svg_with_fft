@@ -6,9 +6,12 @@ from fft_plotter import FftPlotter
 from animation_maker import AnimationMaker
 
 if __name__ == "__main__":
-    svg_path = "./files/music-note.svg"
+    save_path = "./files/rose.mp4"
+    svg_path = "./files/rose.svg"
+    save_path = None
+
     n_samples = 1024
-    duration = 3
+    duration = 1
     n_circle = 401
     svg_analyzer = SvgAnalyzer(svg_path)
     route = svg_analyzer.compute_route(n_samples)
@@ -18,5 +21,5 @@ if __name__ == "__main__":
     routes = fft_plotter.circle_centers
     radii = fft_plotter.circle_radii
 
-    animation_maker = AnimationMaker(routes, radii)
+    animation_maker = AnimationMaker(routes, radii, save_path)
     animation_maker.play(duration)

@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 class AnimationMaker:
-    def __init__(self, circle_routes: np.ndarray, circle_radii: np.ndarray):
+    def __init__(self, circle_routes: np.ndarray, circle_radii: np.ndarray, save_path: str):
+        self.save_path = save_path
         self.circle_routes = circle_routes
         self.circle_radii = circle_radii
         self.n_circles, self.N = self.circle_routes.shape
@@ -12,7 +13,10 @@ class AnimationMaker:
         self.fig, self.ax = plt.subplots()
         self.fig.patch.set_facecolor("black")
         self.ax.set_facecolor("black")
-        self.route = self.ax.scatter([], [], s=0.5, color="orange")
+
+        # IMPORTANT: unpack Line2D
+        self.route, = self.ax.plot([], [], color="orange", linewidth=1)
+
         self.circles = []
         self.lines = []
 
@@ -27,7 +31,7 @@ class AnimationMaker:
                 linewidth=1
             )
             self.circles.append(circle)
-            self.ax.add_patch(self.circles[circle_index])
+            self.ax.add_patch(circle)
 
             line = plt.Line2D(
                 [0],
@@ -37,44 +41,51 @@ class AnimationMaker:
                 linewidth=1
             )
             self.lines.append(line)
-            self.ax.add_line(self.lines[circle_index])
-
+            self.ax.add_line(line)
 
     def update(self, frame):
-        self.route.set_offsets(np.c_[self.curve[:frame].real, self.curve[:frame].imag])
+        frame = frame % self.N
+        # draw curve progressively
+        self.route.set_data(
+            self.curve[:frame].real,
+            self.curve[:frame].imag
+        )
 
-        for circle_index in range(self.n_circles):
-            if circle_index == 0:
-                self.circles[circle_index].center = (0, 0)
-            elif circle_index < self.n_circles:
-                center = (self.circle_routes[circle_index-1, frame].real,
-                          self.circle_routes[circle_index-1, frame].imag
-                          )
-                self.circles[circle_index].center = center
+        for i in range(self.n_circles):
 
-            self.lines[circle_index].set_data([0, 1], [0, 1])
-            if circle_index == 0:
-                self.lines[circle_index].set_data(
-                    [0, self.circle_routes[circle_index, frame].real],
-                    [0, self.circle_routes[circle_index, frame].imag]
+            if i == 0:
+                center = (0, 0)
+            else:
+                center = (
+                    self.circle_routes[i-1, frame].real,
+                    self.circle_routes[i-1, frame].imag
                 )
-            elif circle_index < self.n_circles:
-                self.lines[circle_index].set_data(
+
+            self.circles[i].center = center
+
+            if i == 0:
+                self.lines[i].set_data(
+                    [0, self.circle_routes[i, frame].real],
+                    [0, self.circle_routes[i, frame].imag]
+                )
+            else:
+                self.lines[i].set_data(
                     [
-                        self.circle_routes[circle_index - 1, frame].real,
-                        self.circle_routes[circle_index, frame].real
+                        self.circle_routes[i - 1, frame].real,
+                        self.circle_routes[i, frame].real
                     ],
                     [
-                        self.circle_routes[circle_index - 1, frame].imag,
-                        self.circle_routes[circle_index, frame].imag
+                        self.circle_routes[i - 1, frame].imag,
+                        self.circle_routes[i, frame].imag
                     ]
                 )
 
-        return self.route, *self.circles, *self.lines
+        return (self.route, *self.circles, *self.lines)
 
     def play(self, time: float):
-        interval = int(1000 * time / self.N)
+        interval = np.max([int(1000 * time / self.N), 1])
 
+        # compute bounds
         all_real = np.concatenate([
             self.curve.real,
             np.real(self.circle_routes).ravel()
@@ -87,22 +98,32 @@ class AnimationMaker:
 
         xmin, xmax = 1.1 * np.min(all_real), 1.1 * np.max(all_real)
         ymin, ymax = 1.1 * np.min(all_imag), 1.1 * np.max(all_imag)
+        minimum = np.min([xmin, ymin])
+        maximum = np.max([xmax, ymax])
 
-        self.ax.set_facecolor("black")
         self.ax.set_aspect("equal")
-        self.ax.set_xlim(xmin, xmax)
-        self.ax.set_ylim(ymin, ymax)
+        self.ax.set_xlim(minimum, maximum)
+        self.ax.set_ylim(minimum, maximum)
         self.ax.axis("off")
 
-        ani = FuncAnimation(
+        self.anim = FuncAnimation(
             self.fig,
             self.update,
-            frames=self.N,
+            frames=5*self.N,
             interval=interval,
-            blit=True
+            blit=False
         )
 
-        plt.show()
+        if self.save_path is not None:
+            self.anim.save(
+                self.save_path,
+                writer="ffmpeg",
+                fps=100,
+                dpi=300
+            )
+            print("Done!")
+        else:
+            plt.show()
 
 if __name__ == "__main__":
     N = 1024
@@ -115,4 +136,3 @@ if __name__ == "__main__":
 
     animation_maker = AnimationMaker(routes, radii)
     animation_maker.play(duration)
-    # #TODO save the video
